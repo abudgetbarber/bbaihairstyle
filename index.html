@@ -752,10 +752,12 @@ header {
 </div>
 
 <script>
-const GEMINI_API_KEY = 'AIzaSyDM7kSZTkThzxw-YTV4V4bIlpMdg8_-QLQ'; // ← paste your key here
+const GEMINI_API_KEY = 'YOUR_API_KEY_HERE'; // ← paste your key here
 
 let stream = null;
 let capturedData = null;
+let lastGenTime = 0;
+const COOLDOWN_MS = 65000;
 
 // ── CAMERA ──
 async function enumerateDevices() {
@@ -855,10 +857,42 @@ function handleUpload(e) {
   r.readAsDataURL(file);
 }
 
+// ── COOLDOWN TIMER ──
+function startCooldownTimer(seconds) {
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  setStatus(`⏳ Please wait ${seconds}s before next generation (free tier limit)`, 'error');
+  setOutputStatus(`⏳ Cooling down — ${seconds}s remaining`, 'error');
+  let s = seconds;
+  const t = setInterval(() => {
+    s--;
+    if (s <= 0) {
+      clearInterval(t);
+      btn.disabled = false;
+      setStatus('✓ Ready — click Generate Haircut Grid', 'success');
+      setOutputStatus('Ready for next generation', 'info');
+    } else {
+      setStatus(`⏳ Please wait ${s}s before next generation (free tier limit)`, 'error');
+      setOutputStatus(`⏳ Cooling down — ${s}s remaining`, 'error');
+      btn.textContent = `✦ Wait ${s}s... ✦`;
+    }
+  }, 1000);
+  // Reset button text when done
+  setTimeout(() => { btn.textContent = '✦ Generate Haircut Grid ✦'; }, seconds * 1000);
+}
+
 // ── GENERATE ──
 async function generate() {
   const apiKey = GEMINI_API_KEY;
   if (!capturedData) { setStatus('Capture or upload a photo first', 'error'); return; }
+
+  // Rate limit guard
+  const now = Date.now();
+  const elapsed = now - lastGenTime;
+  if (lastGenTime > 0 && elapsed < COOLDOWN_MS) {
+    startCooldownTimer(Math.ceil((COOLDOWN_MS - elapsed) / 1000));
+    return;
+  }
 
   document.getElementById('outPlaceholder').style.display = 'none';
   document.getElementById('outputImg').style.display = 'none';
@@ -927,10 +961,10 @@ Create a barber-grade haircut reference grid where the uploaded face is IDENTICA
 
     // Model fallback chain — tries each until one works
     const MODELS = [
-      'gemini-2.5-flash-image',
-      'gemini-3.1-flash-image-preview',
-      'gemini-2.5-flash-preview-04-17',
-      'gemini-2.0-flash-preview-image-generation',
+      'gemini-3.1-flash-image-preview',   // Newest — paid key, 4K capable
+      'gemini-3-pro-image-preview',        // Highest quality — paid key
+      'gemini-2.5-flash-image',            // Free + paid, best free tier
+      'gemini-2.0-flash-preview-image-generation', // Legacy fallback
     ];
 
     let imgData = null, imgMime = 'image/png', lastError = '';
@@ -948,7 +982,10 @@ Create a barber-grade haircut reference grid where the uploaded face is IDENTICA
                 { inline_data: { mime_type: mime, data: b64 } },
                 { text: prompt }
               ]}],
-              generationConfig: { responseModalities: ['IMAGE','TEXT'], temperature: 1 }
+              generationConfig: {
+                responseModalities: ['IMAGE', 'TEXT'],
+                temperature: 1,
+              }
             })
           }
         );
@@ -988,8 +1025,10 @@ Create a barber-grade haircut reference grid where the uploaded face is IDENTICA
     out.classList.add('fade-in');
     document.getElementById('outActions').style.display = 'flex';
     setOutputStatus('✓ Haircut reference grid ready', 'success');
+    setStatus('✓ Done! Wait 60s before generating again (free tier limit)', 'success');
     window._outData = imgData;
     window._outMime = imgMime;
+    lastGenTime = Date.now(); // start cooldown
 
   } catch(err) {
     clearInterval(window._stepTimer);
