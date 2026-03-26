@@ -961,10 +961,13 @@ Create a barber-grade haircut reference grid where the uploaded face is IDENTICA
 
     // Model fallback chain — tries each until one works
     const MODELS = [
-      'imagen-3.0-generate-001','gemini-3.1-flash-image-preview',   // Newest — paid key, 4K capable
+      'imagen-3.0-generate-001',
+      'gemini-3.1-flash-image-preview',   // Newest — paid key, 4K capable
       'gemini-3-pro-image-preview',        // Highest quality — paid key
       'gemini-2.5-flash-image',            // Free + paid, best free tier
       'gemini-2.0-flash-preview-image-generation', // Legacy fallback
+      'imagen-3.0-generate-002',         // 🔥 Ultra quality
+  'imagen-4.0-generate-preview'      // 🔥 Latest (paid)
     ];
 
     let imgData = null, imgMime = 'image/png', lastError = '';
