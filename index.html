@@ -641,6 +641,27 @@ header {
   <!-- LEFT COLUMN -->
   <div>
 
+    <!-- STEP 0: API KEY -->
+    <div class="card" style="margin-bottom:28px;">
+      <div class="card-header">
+        <div class="step-badge">✦</div>
+        <div class="card-title">Gemini API Key</div>
+      </div>
+      <div class="section-pad">
+        <label class="field-label">Your Key — stored only in your browser session, never sent anywhere else</label>
+        <div class="input-row">
+          <input type="password" class="text-input" id="apiKeyInput" placeholder="AIza..." autocomplete="off" spellcheck="false" />
+          <button class="icon-btn" id="toggleKeyBtn" onclick="toggleKeyVisibility()">SHOW</button>
+          <button class="icon-btn" onclick="saveKey()">SAVE</button>
+          <button class="icon-btn" onclick="clearKey()" style="color:#e05a4b;border-color:rgba(224,90,75,0.3);">CLEAR</button>
+        </div>
+        <div class="info-box" style="margin:10px 0 0;">
+          Get a free key at <strong>aistudio.google.com</strong> → Get API Key. Your key is saved in your browser's <code>localStorage</code> — it persists across sessions so you never have to re-enter it. Click <strong>Clear</strong> to remove it anytime.
+        </div>
+      </div>
+      <div class="status-bar info" id="keyStatus">No key saved — enter your Gemini API key above</div>
+    </div>
+
     <!-- STEP 1: CAMERA -->
     <div class="card">
       <div class="card-header">
@@ -752,12 +773,40 @@ header {
 </div>
 
 <script>
-const GEMINI_API_KEY = 'AIzaSyBasB0BGBEF92ON8g88-Ol2kr5V-ZTop5Q'; // ← paste your key here
+// ── API KEY HELPERS ──
+function saveKey() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if (!val.startsWith('AIza') || val.length < 20) {
+    setKeyStatus('Invalid key format — must start with AIza...', 'error'); return;
+  }
+  localStorage.setItem('gemini_api_key', val);
+  setKeyStatus('✓ Key saved permanently — auto-loaded next time you open this file', 'success');
+}
+
+function clearKey() {
+  localStorage.removeItem('gemini_api_key');
+  document.getElementById('apiKeyInput').value = '';
+  setKeyStatus('Key cleared — enter a new key and click Save', 'info');
+}
+
+function toggleKeyVisibility() {
+  const inp = document.getElementById('apiKeyInput');
+  const btn = document.getElementById('toggleKeyBtn');
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'HIDE'; }
+  else { inp.type = 'password'; btn.textContent = 'SHOW'; }
+}
+
+function getKey() {
+  return localStorage.getItem('gemini_api_key') || document.getElementById('apiKeyInput').value.trim();
+}
+
+function setKeyStatus(msg, type) {
+  const el = document.getElementById('keyStatus');
+  if (el) { el.textContent = msg; el.className = 'status-bar ' + type; }
+}
 
 let stream = null;
 let capturedData = null;
-let lastGenTime = 0;
-const COOLDOWN_MS = 65000;
 
 // ── CAMERA ──
 async function enumerateDevices() {
@@ -857,42 +906,15 @@ function handleUpload(e) {
   r.readAsDataURL(file);
 }
 
-// ── COOLDOWN TIMER ──
-function startCooldownTimer(seconds) {
-  const btn = document.getElementById('generateBtn');
-  btn.disabled = true;
-  setStatus(`⏳ Please wait ${seconds}s before next generation (free tier limit)`, 'error');
-  setOutputStatus(`⏳ Cooling down — ${seconds}s remaining`, 'error');
-  let s = seconds;
-  const t = setInterval(() => {
-    s--;
-    if (s <= 0) {
-      clearInterval(t);
-      btn.disabled = false;
-      setStatus('✓ Ready — click Generate Haircut Grid', 'success');
-      setOutputStatus('Ready for next generation', 'info');
-    } else {
-      setStatus(`⏳ Please wait ${s}s before next generation (free tier limit)`, 'error');
-      setOutputStatus(`⏳ Cooling down — ${s}s remaining`, 'error');
-      btn.textContent = `✦ Wait ${s}s... ✦`;
-    }
-  }, 1000);
-  // Reset button text when done
-  setTimeout(() => { btn.textContent = '✦ Generate Haircut Grid ✦'; }, seconds * 1000);
-}
-
 // ── GENERATE ──
 async function generate() {
-  const apiKey = GEMINI_API_KEY;
-  if (!capturedData) { setStatus('Capture or upload a photo first', 'error'); return; }
-
-  // Rate limit guard
-  const now = Date.now();
-  const elapsed = now - lastGenTime;
-  if (lastGenTime > 0 && elapsed < COOLDOWN_MS) {
-    startCooldownTimer(Math.ceil((COOLDOWN_MS - elapsed) / 1000));
+  const apiKey = getKey();
+  if (!apiKey || !apiKey.startsWith('AIza')) {
+    setStatus('Enter and save your Gemini API key first ↑', 'error');
+    setKeyStatus('⚠ Key required — enter it above', 'error');
     return;
   }
+  if (!capturedData) { setStatus('Capture or upload a photo first', 'error'); return; }
 
   document.getElementById('outPlaceholder').style.display = 'none';
   document.getElementById('outputImg').style.display = 'none';
@@ -959,24 +981,23 @@ ABSOLUTE RESTRICTIONS:
 GOAL:
 Create a barber-grade haircut reference grid where the uploaded face is IDENTICAL in all 9 tiles and ONLY the hairstyle changes.`;
 
-    // Model fallback chain — tries each until one works
+    // Confirmed working Gemini image generation models (March 2026)
+    // gemini-3.1-flash-image-preview = Nano Banana 2 (latest, best quality + speed)
+    // gemini-2.5-flash-image         = Nano Banana (previous gen, reliable fallback)
+    // gemini-2.0-flash-preview-image-generation = older stable fallback
     const MODELS = [
-      'imagen-3.0-generate-001',
-      'gemini-3.1-flash-image-preview',   // Newest — paid key, 4K capable
-      'gemini-3-pro-image-preview',        // Highest quality — paid key
-      'gemini-2.5-flash-image',            // Free + paid, best free tier
-      'gemini-2.0-flash-preview-image-generation', // Legacy fallback
-      'imagen-3.0-generate-002',         // 🔥 Ultra quality
-  'imagen-4.0-generate-preview'      // 🔥 Latest (paid)
+      { id: 'gemini-3.1-flash-image-preview', label: 'Nano Banana 2 (Latest)' },
+      { id: 'gemini-2.5-flash-image',         label: 'Nano Banana' },
+      { id: 'gemini-2.0-flash-preview-image-generation', label: 'Flash Image (Legacy)' },
     ];
 
     let imgData = null, imgMime = 'image/png', lastError = '';
 
     for (const model of MODELS) {
       try {
-        document.getElementById('loadLabel').textContent = `Trying ${model}...`;
+        document.getElementById('loadLabel').textContent = `Trying ${model.label}...`;
         const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/${model.id}:generateContent?key=${apiKey}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -987,7 +1008,7 @@ Create a barber-grade haircut reference grid where the uploaded face is IDENTICA
               ]}],
               generationConfig: {
                 responseModalities: ['IMAGE', 'TEXT'],
-                temperature: 1,
+                temperature: 1
               }
             })
           }
@@ -996,11 +1017,21 @@ Create a barber-grade haircut reference grid where the uploaded face is IDENTICA
         if (!res.ok) {
           const err = await res.json();
           lastError = err.error?.message || `API error ${res.status}`;
+          console.warn(`[${model.id}] failed:`, lastError);
           continue; // try next model
         }
 
         const data = await res.json();
-        for (const part of (data.candidates?.[0]?.content?.parts || [])) {
+
+        // Check for safety block or empty candidates
+        const candidate = data.candidates?.[0];
+        if (!candidate) {
+          lastError = data.promptFeedback?.blockReason || 'No candidates returned';
+          console.warn(`[${model.id}] no candidates:`, lastError);
+          continue;
+        }
+
+        for (const part of (candidate.content?.parts || [])) {
           if (part.inlineData?.mimeType?.startsWith('image/')) {
             imgData = part.inlineData.data;
             imgMime = part.inlineData.mimeType;
@@ -1008,16 +1039,26 @@ Create a barber-grade haircut reference grid where the uploaded face is IDENTICA
           }
         }
 
-        if (imgData) break; // success — stop trying
-        lastError = data.candidates?.[0]?.content?.parts?.find(p => p.text)?.text || 'No image in response';
+        if (imgData) {
+          console.log(`[${model.id}] ✓ image received`);
+          break;
+        }
+
+        // Model responded but returned only text (no image)
+        lastError = candidate.content?.parts?.find(p => p.text)?.text
+          || candidate.finishReason
+          || 'Model returned no image';
+        console.warn(`[${model.id}] no image in response:`, lastError);
 
       } catch(e) {
         lastError = e.message;
+        console.warn(`[${model.id}] exception:`, e);
       }
     }
 
     if (!imgData) {
-      throw new Error('All models failed. Last error: ' + (lastError.length > 180 ? lastError.slice(0,180)+'...' : lastError));
+      const short = lastError.length > 220 ? lastError.slice(0, 220) + '…' : lastError;
+      throw new Error('All models failed. Last error: ' + short + '\n\nTip: Make sure image generation is enabled on your API key in Google AI Studio.');
     }
 
     clearInterval(window._stepTimer);
@@ -1028,10 +1069,8 @@ Create a barber-grade haircut reference grid where the uploaded face is IDENTICA
     out.classList.add('fade-in');
     document.getElementById('outActions').style.display = 'flex';
     setOutputStatus('✓ Haircut reference grid ready', 'success');
-    setStatus('✓ Done! Wait 60s before generating again (free tier limit)', 'success');
     window._outData = imgData;
     window._outMime = imgMime;
-    lastGenTime = Date.now(); // start cooldown
 
   } catch(err) {
     clearInterval(window._stepTimer);
@@ -1085,7 +1124,7 @@ function setOutputStatus(msg, type) {
 }
 
 // ── DRAG & DROP ──
-const uz = document.getElementById('uploadZone');
+const uz = document.querySelector('.upload-zone');
 uz.addEventListener('dragover', e => { e.preventDefault(); uz.style.borderColor = 'var(--yellow)'; });
 uz.addEventListener('dragleave', () => { uz.style.borderColor = ''; });
 uz.addEventListener('drop', e => {
@@ -1095,6 +1134,12 @@ uz.addEventListener('drop', e => {
 });
 
 window.addEventListener('load', () => {
+  // Restore key from session if available
+  const saved = localStorage.getItem('gemini_api_key');
+  if (saved) {
+    document.getElementById('apiKeyInput').value = saved;
+    setKeyStatus('✓ Key auto-loaded — ready to generate', 'success');
+  }
   if (navigator.mediaDevices?.enumerateDevices) enumerateDevices();
   else setStatus('Camera API unavailable — use Upload', 'error');
 });
