@@ -5,7 +5,7 @@
 //
 // CONFIGURE: Replace YOURUSERNAME with your GitHub username below
 // ============================================================
-const ALLOWED_ORIGIN = 'https://YOURUSERNAME.github.io'; // <-- update this
+const ALLOWED_ORIGIN = 'https://abudgetbarber.github.io/'; // <-- update this
 
 export default {
   async fetch(request, env) {
