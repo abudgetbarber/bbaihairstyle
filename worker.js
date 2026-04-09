@@ -2,13 +2,22 @@
 // Budget Barber – Cloudflare Worker (API Proxy)
 // Deploy this at: https://workers.cloudflare.com
 // Set environment variable: ANTHROPIC_API_KEY = sk-ant-...
+//
+// CONFIGURE: Replace YOURUSERNAME with your GitHub username below
 // ============================================================
+const ALLOWED_ORIGIN = 'https://YOURUSERNAME.github.io'; // <-- update this
 
 export default {
   async fetch(request, env) {
-    // Allow CORS from GitHub Pages and localhost
+    const origin = request.headers.get('Origin') || '';
+    const isAllowed =
+      origin === ALLOWED_ORIGIN ||
+      origin === 'http://localhost' ||
+      origin.startsWith('http://localhost:') ||
+      origin.startsWith('http://127.0.0.1');
+
     const corsHeaders = {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': isAllowed ? origin : ALLOWED_ORIGIN,
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
     };
