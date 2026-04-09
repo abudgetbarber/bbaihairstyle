@@ -303,37 +303,86 @@
 
   .analysis-badge span { opacity: 0.65; margin-right: 6px; }
 
-  .recs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+  .recs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+  @media (max-width: 680px) { .recs-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 420px) { .recs-grid { grid-template-columns: 1fr; } }
 
   .rec-card {
-    background: var(--bg-card); border-radius: 14px; padding: 20px;
+    background: var(--bg-card); border-radius: 16px; overflow: hidden;
     border: 1.5px solid var(--border); box-shadow: 0 2px 8px rgba(10,61,46,0.06);
-    transition: border-color 0.2s, box-shadow 0.2s; animation: fadeUp 0.4s ease both;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    animation: fadeUp 0.4s ease both; cursor: default;
   }
 
-  .rec-card:hover { border-color: var(--green); box-shadow: 0 4px 16px rgba(10,61,46,0.12); }
+  .rec-card:hover {
+    border-color: var(--green); box-shadow: 0 6px 24px rgba(10,61,46,0.14);
+    transform: translateY(-3px);
+  }
 
   @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
+    from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
   .rec-card:nth-child(1) { animation-delay: 0.00s; }
-  .rec-card:nth-child(2) { animation-delay: 0.08s; }
-  .rec-card:nth-child(3) { animation-delay: 0.16s; }
-  .rec-card:nth-child(4) { animation-delay: 0.24s; }
-  .rec-card:nth-child(5) { animation-delay: 0.32s; }
-  .rec-card:nth-child(6) { animation-delay: 0.40s; }
+  .rec-card:nth-child(2) { animation-delay: 0.06s; }
+  .rec-card:nth-child(3) { animation-delay: 0.12s; }
+  .rec-card:nth-child(4) { animation-delay: 0.18s; }
+  .rec-card:nth-child(5) { animation-delay: 0.24s; }
+  .rec-card:nth-child(6) { animation-delay: 0.30s; }
+  .rec-card:nth-child(7) { animation-delay: 0.36s; }
+  .rec-card:nth-child(8) { animation-delay: 0.42s; }
+  .rec-card:nth-child(9) { animation-delay: 0.48s; }
 
-  .rec-rank { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: rgba(10,61,46,0.1); line-height: 1; margin-bottom: 8px; }
-  .rec-name { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--green); margin-bottom: 6px; }
-  .rec-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
-  .rec-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  /* Hair illustration area */
+  .rec-illustration {
+    width: 100%; background: linear-gradient(160deg, #e8f2ec 0%, #f0f6f2 100%);
+    display: flex; align-items: center; justify-content: center;
+    padding: 28px 20px 16px; position: relative; overflow: hidden;
+    min-height: 180px;
+  }
+
+  .rec-illustration::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(10,61,46,0.07) 0%, transparent 70%);
+  }
+
+  .rec-illustration svg { width: 110px; height: 140px; position: relative; z-index: 1; }
+
+  .rec-number {
+    position: absolute; top: 10px; left: 12px;
+    font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 2px;
+    background: var(--green); color: var(--yellow); padding: 2px 8px; border-radius: 4px;
+  }
+
+  .rec-fit-badge {
+    position: absolute; top: 10px; right: 12px;
+    font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    background: rgba(255,255,255,0.85); color: var(--green);
+    padding: 2px 8px; border-radius: 100px; border: 1px solid rgba(10,61,46,0.2);
+  }
+
+  .rec-body { padding: 14px 16px 16px; }
+
+  .rec-name { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--green); margin-bottom: 5px; }
+  .rec-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 10px; }
+  .rec-tags { display: flex; flex-wrap: wrap; gap: 5px; }
 
   .rec-tag {
     background: #e8f2ec; border: 1px solid rgba(10,61,46,0.15);
-    color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
-    text-transform: uppercase; padding: 3px 8px; border-radius: 4px;
+    color: var(--green); font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+    text-transform: uppercase; padding: 2px 7px; border-radius: 4px;
+  }
+
+  /* Grid header */
+  .grid-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px; flex-wrap: wrap; gap: 8px;
+  }
+  .grid-count {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted);
   }
 
   .pro-tip {
@@ -498,6 +547,9 @@
       <div class="green-line"></div>
     </div>
     <div class="analysis-badges" id="analysisBadges"></div>
+    <div class="grid-meta">
+      <span class="grid-count" id="gridCount"></span>
+    </div>
     <div class="recs-grid" id="recsGrid"></div>
     <div class="pro-tip" id="proTip" style="display:none;">
       <div class="pro-tip-icon">💈</div>
@@ -629,7 +681,7 @@
     errorMsg.classList.remove('visible');
 
     const prompt = `You are an expert men's hair stylist for Budget Barber, a digital men's salon in India.
-Analyze the client photo and recommend 5-6 ideal men's hairstyles.
+Analyze the client photo and recommend exactly 9 ideal men's hairstyles.
 
 Client Preferences:
 - Preferred length: ${selectedLength}
@@ -640,10 +692,13 @@ Respond ONLY with valid JSON, no markdown, no backticks, no explanation:
 {
   "faceShape": "detected face shape",
   "hairTexture": "detected hair texture",
+  "skinTone": "detected skin tone",
   "recommendations": [
     {
       "name": "Hairstyle Name",
+      "hairStyle": "one of: buzz_cut|crew_cut|pompadour|fade|undercut|slick_back|textured_crop|quiff|side_part|mohawk|man_bun|caesar|french_crop|taper|ivy_league",
       "description": "2-sentence description of why this suits them",
+      "fit": "Best Fit|Great Match|Suits You",
       "tags": ["tag1", "tag2", "tag3"]
     }
   ],
@@ -684,21 +739,197 @@ Respond ONLY with valid JSON, no markdown, no backticks, no explanation:
     }
   }
 
+  // SVG hair illustrations keyed by hairStyle value
+  const HAIR_SVGS = {
+    buzz_cut: `<svg viewBox="0 0 110 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="55" cy="85" rx="28" ry="35" fill="#d4a96a"/>
+      <ellipse cx="55" cy="55" rx="32" ry="30" fill="#1a2e24"/>
+      <ellipse cx="55" cy="48" rx="26" ry="20" fill="#2d1a0e"/>
+      <ellipse cx="55" cy="85" rx="20" ry="15" fill="#d4a96a"/>
+      <circle cx="46" cy="82" r="3.5" fill="#1a2e24"/>
+      <circle cx="64" cy="82" r="3.5" fill="#1a2e24"/>
+      <ellipse cx="55" cy="94" rx="6" ry="3" fill="#c0876a"/>
+      <path d="M30 55 Q55 25 80 55" stroke="#2d1a0e" stroke-width="8" fill="none" stroke-linecap="round"/>
+    </svg>`,
+    crew_cut: `<svg viewBox="0 0 110 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="55" cy="85" rx="28" ry="35" fill="#d4a96a"/>
+      <ellipse cx="55" cy="50" rx="32" ry="28" fill="#2d1a0e"/>
+      <path d="M24 60 Q55 20 86 60 Q80 45 55 42 Q30 45 24 60Z" fill="#3d2510"/>
+      <ellipse cx="55" cy="85" rx="20" ry="15" fill="#d4a96a"/>
+      <circle cx="46" cy="82" r="3.5" fill="#1a2e24"/>
+      <circle cx="64" cy="82" r="3.5" fill="#1a2e24"/>
+      <ellipse cx="55" cy="94" rx="6" ry="3" fill="#c0876a"/>
+    </svg>`,
+    pompadour: `<svg viewBox="0 0 110 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="55" cy="88" rx="28" ry="35" fill="#d4a96a"/>
+      <ellipse cx="55" cy="55" rx="30" ry="28" fill="#d4a96a"/>
+      <path d="M26 62 Q35 20 55 18 Q75 20 84 62 Q75 55 55 52 Q35 55 26 62Z" fill="#2d1a0e"/>
+      <path d="M38 30 Q55 10 72 30 Q60 25 55 22 Q50 25 38 30Z" fill="#3d2510"/>
+      <circle cx="46" cy="85" r="3.5" fill="#1a2e24"/>
+      <circle cx="64" cy="85" r="3.5" fill="#1a2e24"/>
+      <ellipse cx="55" cy="97" rx="6" ry="3" fill="#c0876a"/>
+    </svg>`,
+    fade: `<svg viewBox="0 0 110 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="55" cy="85" rx="28" ry="35" fill="#d4a96a"/>
+      <ellipse cx="55" cy="58" rx="30" ry="28" fill="#d4a96a"/>
+      <path d="M25 65 Q25 35 55 28 Q85 35 85 65" fill="#2d1a0e"/>
+      <path d="M25 65 Q25 75 27 80" stroke="#3d2510" stroke-width="4" fill="none"/>
+      <path d="M85 65 Q85 75 83 80" stroke="#3d2510" stroke-width="4" fill="none"/>
+      <path d="M28 62 Q55 30 82 62 Q75 50 55 46 Q35 50 28 62Z" fill="#1a0e08"/>
+      <circle cx="46" cy="83" r="3.5" fill="#1a2e24"/>
+      <circle cx="64" cy="83" r="3.5" fill="#1a2e24"/>
+      <ellipse cx="55" cy="95" rx="6" ry="3" fill="#c0876a"/>
+    </svg>`,
+    undercut: `<svg viewBox="0 0 110 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="55" cy="85" rx="28" ry="35" fill="#d4a96a"/>
+      <ellipse cx="55" cy="58" rx="30" ry="28" fill="#d4a96a"/>
+      <path d="M26 65 Q28 38 55 30 Q82 38 84 65 Q75 58 55 54 Q35 58 26 65Z" fill="#2d1a0e"/>
+      <path d="M30 60 Q55 35 80 60" stroke="#1a0e08" stroke-width="3" fill="none"/>
+      <rect x="25" y="62" width="60" height="8" rx="4" fill="#3d2510" opacity="0.3"/>
+      <circle cx="46" cy="83" r="3.5" fill="#1a2e24"/>
+      <circle cx="64" cy="83" r="3.5" fill="#1a2e24"/>
+      <ellipse cx="55" cy="95" rx="6" ry="3" fill="#c0876a"/>
+    </svg>`,
+    slick_back: `<svg viewBox="0 0 110 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="55" cy="86" rx="28" ry="35" fill="#d4a96a"/>
+      <ellipse cx="55" cy="56" rx="30" ry="28" fill="#d4a96a"/>
+      <path d="M26 64 Q30 30 55 26 Q80 30 84 64 Q75 52 55 50 Q35 52 26 64Z" fill="#2d1a0e"/>
+      <path d="M35 32 Q55 28 75 34" stroke="#1a0e08" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M32 38 Q55 32 78 40" stroke="#1a0e08" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M30 44 Q55 37 80 46" stroke="#1a0e08" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <circle cx="46" cy="84" r="3.5" fill="#1a2e24"/>
+      <circle cx="64" cy="84" r="3.5" fill="#1a2e24"/>
+      <ellipse cx="55" cy="96" rx="6" ry="3" fill="#c0876a"/>
+    </svg>`,
+    textured_crop: `<svg viewBox="0 0 110 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="55" cy="86" rx="28" ry="35" fill="#d4a96a"/>
+      <ellipse cx="55" cy="56" rx="30" ry="28" fill="#d4a96a"/>
+      <path d="M27 63 Q30 32 55 28 Q80 32 83 63 Q74 54 55 51 Q36 54 27 63Z" fill="#2d1a0e"/>
+      <path d="M36 34 Q40 28 46 32" stroke="#4a2e18" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M48 30 Q53 24 59 28" stroke="#4a2e18" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M61 32 Q66 26 72 31" stroke="#4a2e18" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="46" cy="84" r="3.5" fill="#1a2e24"/>
+      <circle cx="64" cy="84" r="3.5" fill="#1a2e24"/>
+      <ellipse cx="55" cy="96" rx="6" ry="3" fill="#c0876a"/>
+    </svg>`,
+    quiff: `<svg viewBox="0 0 110 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="55" cy="87" rx="28" ry="35" fill="#d4a96a"/>
+      <ellipse cx="55" cy="57" rx="30" ry="28" fill="#d4a96a"/>
+      <path d="M27 64 Q30 38 55 30 Q80 38 83 64 Q74 55 55 52 Q36 55 27 64Z" fill="#2d1a0e"/>
+      <path d="M42 34 Q55 14 68 34 Q60 28 55 26 Q50 28 42 34Z" fill="#3d2510"/>
+      <path d="M45 36 Q55 18 65 36" stroke="#1a0e08" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <circle cx="46" cy="85" r="3.5" fill="#1a2e24"/>
+      <circle cx="64" cy="85" r="3.5" fill="#1a2e24"/>
+      <ellipse cx="55" cy="97" rx="6" ry="3" fill="#c0876a"/>
+    </svg>`,
+    side_part: `<svg viewBox="0 0 110 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="55" cy="86" rx="28" ry="35" fill="#d4a96a"/>
+      <ellipse cx="55" cy="56" rx="30" ry="28" fill="#d4a96a"/>
+      <path d="M27 63 Q30 32 55 28 Q80 32 83 63 Q74 53 55 50 Q36 53 27 63Z" fill="#2d1a0e"/>
+      <line x1="44" y1="28" x2="44" y2="54" stroke="#c8a882" stroke-width="2"/>
+      <path d="M27 52 Q36 42 44 38" stroke="#1a0e08" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M44 36 Q65 30 83 52" stroke="#1a0e08" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <circle cx="46" cy="84" r="3.5" fill="#1a2e24"/>
+      <circle cx="64" cy="84" r="3.5" fill="#1a2e24"/>
+      <ellipse cx="55" cy="96" rx="6" ry="3" fill="#c0876a"/>
+    </svg>`,
+    mohawk: `<svg viewBox="0 0 110 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="55" cy="86" rx="28" ry="35" fill="#d4a96a"/>
+      <ellipse cx="55" cy="56" rx="30" ry="28" fill="#d4a96a"/>
+      <path d="M27 64 Q30 40 55 32 Q80 40 83 64 Q74 56 55 52 Q36 56 27 64Z" fill="#2d1a0e" opacity="0.4"/>
+      <rect x="49" y="18" width="12" height="38" rx="6" fill="#2d1a0e"/>
+      <path d="M49 18 Q55 6 61 18" fill="#3d2510"/>
+      <circle cx="46" cy="84" r="3.5" fill="#1a2e24"/>
+      <circle cx="64" cy="84" r="3.5" fill="#1a2e24"/>
+      <ellipse cx="55" cy="96" rx="6" ry="3" fill="#c0876a"/>
+    </svg>`,
+    man_bun: `<svg viewBox="0 0 110 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="55" cy="88" rx="28" ry="34" fill="#d4a96a"/>
+      <ellipse cx="55" cy="60" rx="30" ry="28" fill="#d4a96a"/>
+      <path d="M27 66 Q30 36 55 30 Q80 36 83 66 Q74 56 55 52 Q36 56 27 66Z" fill="#2d1a0e"/>
+      <circle cx="55" cy="24" r="10" fill="#2d1a0e"/>
+      <circle cx="55" cy="24" r="7" fill="#3d2510"/>
+      <line x1="55" y1="34" x2="55" y2="44" stroke="#2d1a0e" stroke-width="3"/>
+      <circle cx="46" cy="86" r="3.5" fill="#1a2e24"/>
+      <circle cx="64" cy="86" r="3.5" fill="#1a2e24"/>
+      <ellipse cx="55" cy="98" rx="6" ry="3" fill="#c0876a"/>
+    </svg>`,
+    caesar: `<svg viewBox="0 0 110 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="55" cy="85" rx="28" ry="35" fill="#d4a96a"/>
+      <ellipse cx="55" cy="57" rx="30" ry="26" fill="#d4a96a"/>
+      <path d="M26 62 Q55 28 84 62 Q75 52 55 48 Q35 52 26 62Z" fill="#2d1a0e"/>
+      <path d="M28 56 Q55 40 82 56" stroke="#3d2510" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <circle cx="46" cy="83" r="3.5" fill="#1a2e24"/>
+      <circle cx="64" cy="83" r="3.5" fill="#1a2e24"/>
+      <ellipse cx="55" cy="95" rx="6" ry="3" fill="#c0876a"/>
+    </svg>`,
+    french_crop: `<svg viewBox="0 0 110 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="55" cy="86" rx="28" ry="35" fill="#d4a96a"/>
+      <ellipse cx="55" cy="56" rx="30" ry="27" fill="#d4a96a"/>
+      <path d="M26 63 Q55 28 84 63 Q75 54 55 50 Q35 54 26 63Z" fill="#2d1a0e"/>
+      <path d="M30 54 Q55 44 80 54 Q70 48 55 46 Q40 48 30 54Z" fill="#3d2510"/>
+      <path d="M32 48 Q55 42 78 48" stroke="#1a0e08" stroke-width="2" fill="none"/>
+      <circle cx="46" cy="84" r="3.5" fill="#1a2e24"/>
+      <circle cx="64" cy="84" r="3.5" fill="#1a2e24"/>
+      <ellipse cx="55" cy="96" rx="6" ry="3" fill="#c0876a"/>
+    </svg>`,
+    taper: `<svg viewBox="0 0 110 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="55" cy="85" rx="28" ry="35" fill="#d4a96a"/>
+      <ellipse cx="55" cy="57" rx="30" ry="27" fill="#d4a96a"/>
+      <path d="M26 64 Q28 36 55 28 Q82 36 84 64 Q76 54 55 50 Q34 54 26 64Z" fill="#2d1a0e"/>
+      <path d="M26 64 Q26 72 28 76" stroke="#2d1a0e" stroke-width="3" fill="none"/>
+      <path d="M84 64 Q84 72 82 76" stroke="#2d1a0e" stroke-width="3" fill="none"/>
+      <circle cx="46" cy="83" r="3.5" fill="#1a2e24"/>
+      <circle cx="64" cy="83" r="3.5" fill="#1a2e24"/>
+      <ellipse cx="55" cy="95" rx="6" ry="3" fill="#c0876a"/>
+    </svg>`,
+    ivy_league: `<svg viewBox="0 0 110 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="55" cy="86" rx="28" ry="35" fill="#d4a96a"/>
+      <ellipse cx="55" cy="56" rx="30" ry="27" fill="#d4a96a"/>
+      <path d="M27 63 Q30 33 55 28 Q80 33 83 63 Q74 53 55 50 Q36 53 27 63Z" fill="#2d1a0e"/>
+      <line x1="42" y1="29" x2="42" y2="52" stroke="#c8a882" stroke-width="1.5"/>
+      <path d="M27 52 Q35 44 42 40" stroke="#1a0e08" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M42 38 Q58 32 83 50" stroke="#1a0e08" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M30 58 Q42 50 55 48 Q68 46 80 54" stroke="#3d2510" stroke-width="2" fill="none"/>
+      <circle cx="46" cy="84" r="3.5" fill="#1a2e24"/>
+      <circle cx="64" cy="84" r="3.5" fill="#1a2e24"/>
+      <ellipse cx="55" cy="96" rx="6" ry="3" fill="#c0876a"/>
+    </svg>`
+  };
+
+  const DEFAULT_SVG = HAIR_SVGS.crew_cut;
+
+  function getHairSVG(hairStyle) {
+    if (!hairStyle) return DEFAULT_SVG;
+    const key = hairStyle.toLowerCase().replace(/[^a-z_]/g, '');
+    return HAIR_SVGS[key] || DEFAULT_SVG;
+  }
+
   function renderResults(data) {
     recsGrid.innerHTML = '';
     analysisBadges.innerHTML = '';
 
     if (data.faceShape) analysisBadges.innerHTML += `<div class="analysis-badge"><span>Face Shape</span><strong>${data.faceShape}</strong></div>`;
     if (data.hairTexture) analysisBadges.innerHTML += `<div class="analysis-badge"><span>Hair Texture</span><strong>${data.hairTexture}</strong></div>`;
+    if (data.skinTone) analysisBadges.innerHTML += `<div class="analysis-badge"><span>Skin Tone</span><strong>${data.skinTone}</strong></div>`;
+
+    const count = (data.recommendations || []).length;
+    document.getElementById('gridCount').textContent = `${count} Hairstyle Variations`;
 
     data.recommendations.forEach((rec, i) => {
       const card = document.createElement('div');
       card.className = 'rec-card';
       card.innerHTML = `
-        <div class="rec-rank">0${i + 1}</div>
-        <div class="rec-name">${rec.name}</div>
-        <div class="rec-desc">${rec.description}</div>
-        <div class="rec-tags">${(rec.tags || []).map(t => `<span class="rec-tag">${t}</span>`).join('')}</div>
+        <div class="rec-illustration">
+          <span class="rec-number">#${String(i + 1).padStart(2, '0')}</span>
+          ${rec.fit ? `<span class="rec-fit-badge">${rec.fit}</span>` : ''}
+          ${getHairSVG(rec.hairStyle)}
+        </div>
+        <div class="rec-body">
+          <div class="rec-name">${rec.name}</div>
+          <div class="rec-desc">${rec.description}</div>
+          <div class="rec-tags">${(rec.tags || []).map(t => `<span class="rec-tag">${t}</span>`).join('')}</div>
+        </div>
       `;
       recsGrid.appendChild(card);
     });
